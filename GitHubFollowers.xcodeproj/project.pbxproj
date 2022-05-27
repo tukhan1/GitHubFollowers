@@ -29,6 +29,7 @@
 		774B512827FC69AF00F9FF81 /* FollowerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774B512727FC69AF00F9FF81 /* FollowerCell.swift */; };
 		774B512A27FC6B7700F9FF81 /* GFAvatarImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774B512927FC6B7700F9FF81 /* GFAvatarImageView.swift */; };
 		774B512D27FC792E00F9FF81 /* CollectionCell+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774B512C27FC792E00F9FF81 /* CollectionCell+Ext.swift */; };
+		774B512F27FC9F1200F9FF81 /* UIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774B512E27FC9F1200F9FF81 /* UIHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +56,7 @@
 		774B512727FC69AF00F9FF81 /* FollowerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerCell.swift; sourceTree = "<group>"; };
 		774B512927FC6B7700F9FF81 /* GFAvatarImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GFAvatarImageView.swift; sourceTree = "<group>"; };
 		774B512C27FC792E00F9FF81 /* CollectionCell+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionCell+Ext.swift"; sourceTree = "<group>"; };
+		774B512E27FC9F1200F9FF81 /* UIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				774B512427F76FFB00F9FF81 /* NWError.swift */,
+				774B512E27FC9F1200F9FF81 /* UIHelper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				774B510327F5F4B400F9FF81 /* FavoritesListVC.swift in Sources */,
 				774B512027F761E400F9FF81 /* Followers.swift in Sources */,
 				774B510527F5F8B600F9FF81 /* GFButton.swift in Sources */,
+				774B512F27FC9F1200F9FF81 /* UIHelper.swift in Sources */,
 				774B510727F5FB9100F9FF81 /* GFTextField.swift in Sources */,
 				774B511C27F74EDB00F9FF81 /* NetworkManager.swift in Sources */,
 				774B511427F72F7000F9FF81 /* UIViewController+Ext.swift in Sources */,

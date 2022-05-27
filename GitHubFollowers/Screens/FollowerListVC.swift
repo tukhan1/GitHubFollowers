@@ -12,18 +12,20 @@ class FollowerListVC: UIViewController {
     enum Section {
         case main
     }
-
-    var username: String!
+    
+    var username: String = ""
+    private var page: Int = 1
+    private var hasMoreFollowers: Bool = true
+    
     private var followers: [Follower] = []
-    private lazy var collectionView: UICollectionView = UICollectionView(frame: view.bounds,
-                                                                         collectionViewLayout: createThreeColumnFlowLayout())
+    private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Section, Follower>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
         makeConstraints()
-        getFollowers()
+        getFollowers(username: username, page: page)
         configureDataSource()
     }
     
@@ -32,40 +34,29 @@ class FollowerListVC: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
-    private func getFollowers() {
-        NetworkManager.shared.getFollowers(for: username, page: 1) { result in
+    private func getFollowers(username: String, page: Int) {
+        NetworkManager.shared.getFollowers(for: username, page: page) { [weak self] result in
+            guard let self = self else { return }
+            
             switch result {
             case .success(let newFollowers):
-                    self.followers = newFollowers
-                    self.updateData()
+                if newFollowers.count < 100 { self.hasMoreFollowers = false }
+                self.followers.append(contentsOf: newFollowers)
+                self.updateData()
             case .failure(let error):
                 self.presentGFAlertOnMainThread(title: "Oops recived Error", message: error.rawValue, buttonTitle: "Meh")
             }
         }
     }
     
-    private func createThreeColumnFlowLayout() -> UICollectionViewFlowLayout {
-        let widht = view.bounds.width
-        let padding: CGFloat = 12
-        let minimumItemSpacing: CGFloat = 10
-        let avalibleWidth = widht - (padding * 2) - (minimumItemSpacing * 2)
-        let itemWidht = avalibleWidth / 3
-        
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-        flowLayout.itemSize = CGSize(width: itemWidht, height: itemWidht + 40)
-        
-        return flowLayout
-    }
-    
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<Section, Follower>(
             collectionView: collectionView,
             cellProvider: { collectionView, indexPath, follower in
-            let cell = collectionView.dequeueReusableCell(type: FollowerCell.self, for: indexPath)
-            cell.set(follower: follower)
-            return cell
-        })
+                let cell = collectionView.dequeueReusableCell(type: FollowerCell.self, for: indexPath)
+                cell.set(follower: follower)
+                return cell
+            })
     }
     
     private func updateData() {
@@ -76,7 +67,9 @@ class FollowerListVC: UIViewController {
     }
     
     private func configure() {
-
+        collectionView = UICollectionView(frame: view.bounds,
+                                          collectionViewLayout: UIHelper.createThreeColumnFlowLayout(in: view))
+        
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -84,6 +77,7 @@ class FollowerListVC: UIViewController {
         
         collectionView.backgroundColor = .systemBackground
         collectionView.register(FollowerCell.self)
+        collectionView.delegate = self
     }
     
     private func makeConstraints() {
@@ -92,6 +86,20 @@ class FollowerListVC: UIViewController {
             maker.left.equalTo(view.snp.left)
             maker.right.equalTo(view.snp.right)
             maker.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+        }
+    }
+}
+
+extension FollowerListVC: UICollectionViewDelegate {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - height {
+            guard hasMoreFollowers else { return }
+            page += 1
+            getFollowers(username: username, page: page)
         }
     }
 }
