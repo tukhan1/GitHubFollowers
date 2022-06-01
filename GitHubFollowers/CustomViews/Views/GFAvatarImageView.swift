@@ -7,7 +7,7 @@
 
 import UIKit
 
-class GFAvatarImageView: UIImageView {
+final class GFAvatarImageView: UIImageView {
     
     private let cache = NetworkManager.shared.cahce
     private let placeholderImage = UIImage(named: "empty-state-logo")!

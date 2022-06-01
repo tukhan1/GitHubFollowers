@@ -59,4 +59,41 @@ final class NetworkManager {
         }
         task.resume()
     }
+    
+    func getUserInfo(for username: String, complition: @escaping (Result<User, NWError>) -> Void ){
+        guard let url = URL(string: baseURL + username) else {
+            complition(.failure(NWError.invalidUrl))
+            return
+        }
+
+        let request = URLRequest(url: url)
+        let urlSession = URLSession(configuration: .default)
+        let task = urlSession.dataTask(with: request) { data, response, error in
+
+            if let _ = error {
+                complition(.failure(NWError.unableToComplite))
+                return
+            }
+
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                complition(.failure(NWError.invalidResponse))
+                return
+            }
+
+            guard let safeData = data else {
+                complition(.failure(NWError.invalidData))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let user = try decoder.decode(User.self, from: safeData)
+                complition(.success(user))
+            } catch {
+                complition(.failure(NWError.invalidData))
+            }
+        }
+        task.resume()
+    }
 }

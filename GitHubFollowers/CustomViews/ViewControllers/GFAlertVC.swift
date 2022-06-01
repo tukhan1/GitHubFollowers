@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class GFAlertVC: UIViewController {
+final class GFAlertVC: UIViewController {
 
     private let containerView = UIView(frame: .zero)
     private let titleLabel = GFTitleLabel(textAligment: .center, fontSize: 20)

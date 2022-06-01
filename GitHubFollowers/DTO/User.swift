@@ -6,15 +6,15 @@
 //
 
 struct User: Codable {
-    var username: String
-    var avatarUrl: String
+    let login: String
+    let avatarUrl: String
     var name: String?
     var location: String?
     var bio: String?
-    var publicRepos: Int
-    var publicGists: Int
-    var html_url: String
-    var following: Int
-    var followers: Int
-    var createdAt: String
+    let publicRepos: Int
+    let publicGists: Int
+    let url: String
+    let following: Int
+    let followers: Int
+    let createdAt: String
 }

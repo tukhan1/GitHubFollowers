@@ -6,6 +6,6 @@
 //
 
 struct Follower: Codable, Hashable {
-    var login: String
-    var avatarUrl: String
+    let login: String
+    let avatarUrl: String
 }
