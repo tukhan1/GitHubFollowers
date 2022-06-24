@@ -5,8 +5,6 @@
 //  Created by Egor Tushev on 01.04.2022.
 //
 
-import Foundation
-
 enum NWError: String, Error {
     case invalidUrl = "The username is incorrect. Let's try again with new name."
     case invalidData = "There is some problem with followers. Try again a bit later."
