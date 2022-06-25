@@ -7,12 +7,16 @@
 
 import UIKit
 
+protocol FollowerListVCDelegate: AnyObject {
+    func didRequestFollowers(for username: String)
+}
+
 class FollowerListVC: UIViewController {
-    
+
     enum Section {
         case main
     }
-    
+
     var username: String = ""
     private var page: Int = 1
     private var hasMoreFollowers: Bool = true
@@ -44,11 +48,11 @@ class FollowerListVC: UIViewController {
             self.dismissLoadingView()
             switch result {
             case .success(let newFollowers):
-                if newFollowers.count < 100 { self.hasMoreFollowers = false }
+                if newFollowers.count < 100 { self.hasMoreFollowers = false } else { self.hasMoreFollowers = true }
                 self.followers.append(contentsOf: newFollowers)
                 if self.followers.isEmpty {
                     let message = "This user doesn't have any followers. Go follow them 😉."
-                    DispatchQueue.main.async { self.showEmptyStateVieew(with: message, in: self.view) }
+                    DispatchQueue.main.async { self.showEmptyStateView(with: message, in: self.view) }
                 }
                 self.updateData(on: self.followers)
             case .failure(let error):
@@ -112,6 +116,7 @@ extension FollowerListVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let follower = isSearching ? filteredFollowers[indexPath.item] : followers[indexPath.item]
         let userInfoVC = UserInfoVC(username: follower.login)
+        userInfoVC.delegate = self
         let navController = UINavigationController(rootViewController: userInfoVC)
         present(navController, animated: true)
     }
@@ -140,5 +145,17 @@ extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         isSearching = false
         updateData(on: followers)
+    }
+}
+
+extension FollowerListVC: FollowerListVCDelegate {
+    func didRequestFollowers(for username: String) {
+        self.username = username
+        title = username
+        page = 1
+        followers.removeAll()
+        filteredFollowers.removeAll()
+        collectionView.setContentOffset(.zero, animated: true)
+        getFollowers(username: username, page: page)
     }
 }

@@ -14,6 +14,7 @@ struct User: Codable {
     let publicRepos: Int
     let publicGists: Int
     let url: String
+    let htmlUrl: String
     let following: Int
     let followers: Int
     let createdAt: String

@@ -11,9 +11,11 @@ class GFItemInfoVC: UIViewController {
 
     let itemInfoViewOne: GFItemInfoView = GFItemInfoView()
     let itemInfoViewTwo: GFItemInfoView = GFItemInfoView()
-    let actionBotton: GFButton = GFButton()
+    let actionButton: GFButton = GFButton()
 
-    var user: User?
+    weak var delegate: UserInfoVCDelegate?
+
+    var user: User!
 
     private let stackView: UIStackView = UIStackView()
 
@@ -29,6 +31,7 @@ class GFItemInfoVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        configureActionButton()
         makeConstraints()
     }
 
@@ -43,8 +46,14 @@ class GFItemInfoVC: UIViewController {
         view.backgroundColor = .secondarySystemBackground
 
         view.addSubview(stackView)
-        view.addSubview(actionBotton)
+        view.addSubview(actionButton)
     }
+
+    private func configureActionButton() {
+        actionButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
+    }
+
+    @objc func actionButtonTapped() {}
 
     private func makeConstraints() {
         let padding = 10
@@ -54,7 +63,7 @@ class GFItemInfoVC: UIViewController {
             make.top.equalTo(view.snp.top).offset(padding)
             make.height.equalTo(50)
         }
-        actionBotton.snp.makeConstraints { make in
+        actionButton.snp.makeConstraints { make in
             make.left.equalTo(view.snp.left).offset(padding)
             make.right.equalTo(view.snp.right).inset(padding)
             make.height.equalTo(44)
