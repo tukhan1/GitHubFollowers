@@ -19,12 +19,12 @@ final class NetworkManager {
         self.baseURL = baseURL
     }
 
-    func getFollowers(for username: String, page: Int, complition: @escaping (Result<[Follower], NWError>) -> Void) {
+    func getFollowers(for username: String, page: Int, complition: @escaping (Result<[Follower], GFError>) -> Void) {
 
         let path = username + "/followers?per_page=100&page=\(page)"
 
         guard let url = URL(string: baseURL + path) else {
-            complition(.failure(NWError.invalidUrl))
+            complition(.failure(GFError.invalidUrl))
             return
         }
 
@@ -33,17 +33,17 @@ final class NetworkManager {
         let task = urlSession.dataTask(with: request) { data, response, error in
 
             if let _ = error {
-                complition(.failure(NWError.unableToComplite))
+                complition(.failure(GFError.unableToComplite))
                 return
             }
 
             guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                complition(.failure(NWError.invalidResponse))
+                complition(.failure(GFError.invalidResponse))
                 return
             }
 
             guard let safeData = data else {
-                complition(.failure(NWError.invalidData))
+                complition(.failure(GFError.invalidData))
                 return
             }
 
@@ -54,15 +54,15 @@ final class NetworkManager {
                 let data = followers
                 complition(.success(data))
             } catch {
-                complition(.failure(NWError.invalidData))
+                complition(.failure(GFError.invalidData))
             }
         }
         task.resume()
     }
     
-    func getUserInfo(for username: String, complition: @escaping (Result<User, NWError>) -> Void ){
+    func getUserInfo(for username: String, complition: @escaping (Result<User, GFError>) -> Void ){
         guard let url = URL(string: baseURL + username) else {
-            complition(.failure(NWError.invalidUrl))
+            complition(.failure(GFError.invalidUrl))
             return
         }
 
@@ -71,17 +71,17 @@ final class NetworkManager {
         let task = urlSession.dataTask(with: request) { data, response, error in
 
             if let _ = error {
-                complition(.failure(NWError.unableToComplite))
+                complition(.failure(GFError.unableToComplite))
                 return
             }
 
             guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                complition(.failure(NWError.invalidResponse))
+                complition(.failure(GFError.invalidResponse))
                 return
             }
 
             guard let safeData = data else {
-                complition(.failure(NWError.invalidData))
+                complition(.failure(GFError.invalidData))
                 return
             }
 
@@ -91,7 +91,7 @@ final class NetworkManager {
                 let user = try decoder.decode(User.self, from: safeData)
                 complition(.success(user))
             } catch {
-                complition(.failure(NWError.invalidData))
+                complition(.failure(GFError.invalidData))
             }
         }
         task.resume()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class GFRepoItemVC: GFItemInfoVC {
+final class GFRepoItemVC: GFItemInfoVC {
     
     override func viewDidLoad() {
         super.viewDidLoad()

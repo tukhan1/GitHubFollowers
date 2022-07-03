@@ -82,7 +82,6 @@ final class UserInfoVC: UIViewController {
         view.backgroundColor = .systemBackground
 
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissVC))
-        doneButton.tintColor = .systemGreen
         navigationItem.rightBarButtonItem = doneButton
     }
 

@@ -64,7 +64,7 @@ final class GFAlertVC: UIViewController {
         containerView.snp.makeConstraints { maker in
             maker.centerY.equalTo(view.snp.centerY)
             maker.centerX.equalTo(view.snp.centerX)
-            maker.width.equalTo(view.snp.width).multipliedBy(0.85)
+            maker.width.equalTo(view.snp.width).multipliedBy(0.80)
             maker.height.equalTo(220)
         }
         titleLabel.snp.makeConstraints { maker in
@@ -83,7 +83,7 @@ final class GFAlertVC: UIViewController {
             maker.bottom.equalTo(containerView.snp.bottom).inset(padding)
             maker.left.equalTo(containerView.snp.left).offset(padding)
             maker.right.equalTo(containerView.snp.right).inset(padding)
-            maker.height.equalTo(containerView.snp.height).multipliedBy(0.15)
+            maker.height.equalTo(40)
         }
     }
 }
