@@ -10,7 +10,7 @@ import SnapKit
 
 final class GFAlertVC: UIViewController {
 
-    private let containerView = UIView(frame: .zero)
+    private let containerView = GFAlertContainerView(frame: .zero)
     private let titleLabel = GFTitleLabel(textAligment: .center, fontSize: 20)
     private let messageLabel = GFBodyLabel(textAligment: .center)
     private let actionBotton = GFButton(backgroundColor: .systemPink, title: "Ok")
@@ -34,21 +34,14 @@ final class GFAlertVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.75)
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.75)
         configure()
         makeConstraints()
     }
 
     private func configure() {
         view.addSubview(containerView)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(messageLabel)
-        containerView.addSubview(actionBotton)
-
-        containerView.backgroundColor = .systemBackground
-        containerView.layer.cornerRadius = 16
-        containerView.layer.borderWidth = 2
-        containerView.layer.borderColor = UIColor.white.cgColor
+        containerView.addSubviews(titleLabel, messageLabel, actionBotton)
 
         titleLabel.text = alertTitle ?? "Something went wrong"
         messageLabel.text = message ?? "Unable to complete request"

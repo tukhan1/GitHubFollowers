@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import SnapKit
 
-class FavoritesListVC: UIViewController {
+final class FavoritesListVC: GFDataLoadingVC {
 
     private var favorites: [Follower] = []
 
@@ -19,44 +20,18 @@ class FavoritesListVC: UIViewController {
         configure()
         configureTableView()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         getFavorites()
     }
 
-    private func getFavorites() {
-
-        showLoadingView()
-
-        PersistenceManager.retrieveFavorites { [weak self] result in
-            guard let self = self else { return }
-            self.dismissLoadingView()
-            switch result {
-            case.success(let favorites):
-                if favorites.isEmpty {
-                    DispatchQueue.main.async {
-                        self.showEmptyStateView(with: "Add users to favorites to see them here", in: self.view)
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.favorites = favorites
-                        self.tableView.reloadData()
-                        self.view.bringSubviewToFront(self.tableView)
-                    }
-                }
-            case.failure(let error):
-                print(error.rawValue)
-            }
-        }
-    }
-
     private func configure() {
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
     }
-    
+
     private func configureTableView() {
         view.addSubview(tableView)
         tableView.rowHeight = 80
@@ -64,12 +39,39 @@ class FavoritesListVC: UIViewController {
         tableView.delegate = self
 
         tableView.register(FavoriteCell.self, forCellReuseIdentifier: FavoriteCell.identifier)
-        
+
         tableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.equalTo(view.snp.left)
             make.right.equalTo(view.snp.right)
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+        }
+    }
+
+    private func getFavorites() {
+        showLoadingView()
+
+        PersistenceManager.retrieveFavorites { [weak self] result in
+            guard let self = self else { return }
+            self.dismissLoadingView()
+            switch result {
+            case.success(let favorites):
+                self.updateUI(with: favorites)
+            case.failure(let error):
+                print(error.rawValue)
+            }
+        }
+    }
+
+    private func updateUI(with favorites: [Follower]) {
+        if favorites.isEmpty {
+            self.showEmptyStateView(with: "Add users to favorites to see them here", in: self.view)
+        } else {
+            self.favorites = favorites
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                self.view.bringSubviewToFront(self.tableView)
+            }
         }
     }
 }
@@ -93,10 +95,8 @@ extension FavoritesListVC: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let favorite = favorites[indexPath.row]
-        let destVC = FollowerListVC()
-        destVC.username = favorite.login
-        destVC.title = favorite.login
-        
+        let destVC = FollowerListVC(username: favorite.login)
+
         navigationController?.pushViewController(destVC, animated: true)
     }
 
@@ -104,13 +104,13 @@ extension FavoritesListVC: UITableViewDelegate {
 
         guard editingStyle == .delete else { return }
 
-        let favorite = favorites[indexPath.row]
-        favorites.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .fade)
-
-        PersistenceManager.updateWith(favorite: favorite, actionType: .remove) { [weak self] error in
+        PersistenceManager.updateWith(favorite: favorites[indexPath.row], actionType: .remove) { [weak self] error in
             guard let self = self else { return }
-            guard let error = error else { return }
+            guard let error = error else {
+                self.favorites.remove(at: indexPath.row)
+                self.tableView.deleteRows(at: [indexPath], with: .fade)
+                return
+            }
             self.presentGFAlertOnMainThread(title: "Error", message: error.rawValue, buttonTitle: "Ok")
         }
     }

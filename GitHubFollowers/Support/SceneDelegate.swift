@@ -18,48 +18,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = createTabbar()
+        window?.rootViewController = GFTabBarController()
         window?.makeKeyAndVisible()
 
         configureNavigationBar()
-    }
-    
-    private func createSearchNC() -> UINavigationController {
-        let searchVC = SearchVC()
-        searchVC.title = "Search"
-        searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 0)
-        
-        return UINavigationController(rootViewController: searchVC)
-    }
-
-    private func createFavoritesNC() -> UINavigationController {
-        let favoriteshVC = FavoritesListVC()
-        favoriteshVC.title = "Favorites"
-        favoriteshVC.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 1)
-        
-        return UINavigationController(rootViewController: favoriteshVC)
-    }
-
-    private func createTabbar() -> UITabBarController {
-        let tabbar = UITabBarController()
-        UITabBar.appearance().tintColor = .systemGreen
-        tabbar.viewControllers = [createSearchNC(),
-                                  createFavoritesNC()]
-        configureTabBar()
-        return tabbar
-    }
-    
-    private func configureTabBar() {
-        if #available(iOS 13.0, *) {
-            let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
-            tabBarAppearance.configureWithDefaultBackground()
-            tabBarAppearance.backgroundColor = UIColor.systemBackground
-            UITabBar.appearance().standardAppearance = tabBarAppearance
-
-            if #available(iOS 15.0, *) {
-                UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-            }
-        }
     }
 
     private func configureNavigationBar() {

@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import SnapKit
 
-class FavoriteCell: UITableViewCell {
+final class FavoriteCell: UITableViewCell {
 
     static let identifier = "\(FavoriteCell.self)"
 
@@ -20,14 +21,17 @@ class FavoriteCell: UITableViewCell {
         makeConstraints()
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     func set(favorite: Follower) {
+        avatarImageView.downloadImage(fromUrl: favorite.avatarUrl)
         self.usernameLabel.text = favorite.login
-        self.avatarImageView.downloadImage(from: favorite.avatarUrl)
     }
 
     private func configure() {
-        addSubview(avatarImageView)
-        addSubview(usernameLabel)
+        addSubviews(avatarImageView, usernameLabel)
 
         accessoryType = .disclosureIndicator
     }
@@ -46,9 +50,5 @@ class FavoriteCell: UITableViewCell {
             make.centerY.equalTo(self.snp.centerY)
             make.height.equalTo(40)
         }
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 final class GFUserInfoHeaderVC: UIViewController {
 
@@ -30,12 +31,16 @@ final class GFUserInfoHeaderVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        makeConstraints()
         configureUIElements()
+        makeConstraints()
     }
-    
+
+    private func configure() {
+        view.addSubviews(avatarImageView, userNameLabel, nameLabel, locationImageView, locationLabel, bioLabel)
+    }
+
     func configureUIElements() {
-        avatarImageView.downloadImage(from: user.avatarUrl)
+        avatarImageView.downloadImage(fromUrl: user.avatarUrl)
         userNameLabel.text = user.login
         nameLabel.text = user.name ?? ""
         locationLabel.text = user.location ?? "No Location"
@@ -43,17 +48,8 @@ final class GFUserInfoHeaderVC: UIViewController {
 
         bioLabel.numberOfLines = 3
 
-        locationImageView.image = UIImage(systemName: SFSymbols.location)
+        locationImageView.image = SFSymbols.location
         locationImageView.tintColor = .secondaryLabel
-    }
-
-    private func configure() {
-        view.addSubview(avatarImageView)
-        view.addSubview(userNameLabel)
-        view.addSubview(nameLabel)
-        view.addSubview(locationImageView)
-        view.addSubview(locationLabel)
-        view.addSubview(bioLabel)
     }
 
     private func makeConstraints() {
@@ -92,7 +88,7 @@ final class GFUserInfoHeaderVC: UIViewController {
             make.top.equalTo(avatarImageView.snp.bottom)
             make.left.equalTo(view.snp.left)
             make.right.equalTo(view.snp.right)
-            make.height.equalTo(60)
+            make.height.equalTo(90)
         }
     }
 }

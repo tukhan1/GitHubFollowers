@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import SnapKit
 
 enum ItemInfoType {
     case repos, gists, followers, following
 }
 
 class GFItemInfoView: UIView {
+
     private let itemImageView: UIImageView = UIImageView(frame: .zero)
     private let itemTitleLabel: GFTitleLabel = GFTitleLabel(textAligment: .left, fontSize: 16)
     private let itemCounter: GFTitleLabel = GFTitleLabel(textAligment: .center, fontSize: 16)
@@ -27,10 +29,8 @@ class GFItemInfoView: UIView {
     }
 
     private func configure() {
-        addSubview(itemImageView)
-        addSubview(itemTitleLabel)
-        addSubview(itemCounter)
-        
+        addSubviews(itemImageView, itemTitleLabel, itemCounter)
+
         itemImageView.tintColor = .label
     }
 
@@ -58,16 +58,16 @@ class GFItemInfoView: UIView {
     func set(itemInfoType: ItemInfoType, withCount count: Int) {
         switch itemInfoType {
         case .repos:
-            itemImageView.image = UIImage(systemName: SFSymbols.repos)
+            itemImageView.image = SFSymbols.repos
             itemTitleLabel.text = "Public Repos"
         case .gists:
-            itemImageView.image = UIImage(systemName: SFSymbols.gists)
+            itemImageView.image = SFSymbols.gists
             itemTitleLabel.text = "Public Gists"
         case .followers:
-            itemImageView.image = UIImage(systemName: SFSymbols.followers)
+            itemImageView.image = SFSymbols.followers
             itemTitleLabel.text = "Followers"
         case .following:
-            itemImageView.image = UIImage(systemName: SFSymbols.following)
+            itemImageView.image = SFSymbols.following
             itemTitleLabel.text = "Following"
         }
         itemCounter.text = String(count)

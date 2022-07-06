@@ -9,14 +9,13 @@ import UIKit
 import SnapKit
 
 protocol UserInfoVCDelegate: AnyObject {
-    func didTapGitHubProfile(for user: User)
-    func didTapGetFollowers(for user: User)
+    func didRequestFollowers(for username: String)
 }
 
-final class UserInfoVC: UIViewController {
-    
-    weak var delegate: FollowerListVCDelegate?
-    
+final class UserInfoVC: GFDataLoadingVC {
+
+    weak var delegate: UserInfoVCDelegate?
+
     private var username: String = ""
 
     private let headerView: UIView = UIView(frame: .zero)
@@ -41,45 +40,10 @@ final class UserInfoVC: UIViewController {
         getUserInfo(for: username)
     }
 
-    private func makeConstraints() {
-        let supportViews = [headerView, itemViewOne, itemViewTwo, dateLabel]
-        let padding: CGFloat = 20
-        let itemHeight: CGFloat = 140
-
-        for supportView in supportViews {
-            view.addSubview(supportView)
-
-            supportView.snp.makeConstraints { make in
-                make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(padding)
-                make.right.equalTo(view.safeAreaLayoutGuide.snp.right).inset(padding)
-            }
-        }
-
-        view.addSubview(dateLabel)
-
-        headerView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.height.equalTo(180)
-        }
-
-        itemViewOne.snp.makeConstraints { make in
-            make.top.equalTo(headerView.snp.bottom).offset(padding)
-            make.height.equalTo(itemHeight)
-        }
-
-        itemViewTwo.snp.makeConstraints { make in
-            make.top.equalTo(itemViewOne.snp.bottom).offset(padding)
-            make.height.equalTo(itemHeight)
-        }
-
-        dateLabel.snp.makeConstraints { make in
-            make.top.equalTo(itemViewTwo.snp.bottom).offset(padding)
-            make.height.equalTo(18)
-        }
-    }
-    
     private func configure() {
         view.backgroundColor = .systemBackground
+
+        view.addSubviews(headerView, itemViewOne, itemViewTwo, dateLabel, dateLabel)
 
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissVC))
         navigationItem.rightBarButtonItem = doneButton
@@ -88,10 +52,45 @@ final class UserInfoVC: UIViewController {
     @objc private func dismissVC() {
         dismiss(animated: true)
     }
-    
+
+    private func makeConstraints() {
+
+        let supportViews = [headerView, itemViewOne, itemViewTwo, dateLabel]
+        let padding: CGFloat = 20
+        let itemHeight: CGFloat = 140
+
+        for supportView in supportViews {
+
+            supportView.snp.makeConstraints { make in
+                make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(padding)
+                make.right.equalTo(view.safeAreaLayoutGuide.snp.right).inset(padding)
+            }
+        }
+
+        headerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.height.equalTo(210)
+        }
+        itemViewOne.snp.makeConstraints { make in
+            make.top.equalTo(headerView.snp.bottom).offset(padding)
+            make.height.equalTo(itemHeight)
+        }
+        itemViewTwo.snp.makeConstraints { make in
+            make.top.equalTo(itemViewOne.snp.bottom).offset(padding)
+            make.height.equalTo(itemHeight)
+        }
+        dateLabel.snp.makeConstraints { make in
+            make.top.equalTo(itemViewTwo.snp.bottom).offset(padding)
+            make.height.equalTo(50)
+        }
+    }
+
     private func getUserInfo(for username: String) {
+        showLoadingView()
+
         NetworkManager.shared.getUserInfo(for: username) { [weak self] result in
             guard let self = self else { return }
+            self.dismissLoadingView()
             switch result {
             case .success(let newUser):
                 DispatchQueue.main.async { self.configureUIElements(with: newUser) }
@@ -102,16 +101,10 @@ final class UserInfoVC: UIViewController {
     }
 
     private func configureUIElements(with user: User) {
-        let repoItemVC = GFRepoItemVC(user: user)
-        repoItemVC.delegate = self
-
-        let followerItemVC = GFFollowerItemVC(user: user)
-        followerItemVC.delegate = self
-
-        self.add(childVC: repoItemVC, to: self.itemViewOne)
-        self.add(childVC: followerItemVC, to: self.itemViewTwo)
+        self.add(childVC: GFRepoItemVC(user: user, delegate: self), to: self.itemViewOne)
+        self.add(childVC: GFFollowerItemVC(user: user, delegate: self), to: self.itemViewTwo)
         self.add(childVC: GFUserInfoHeaderVC(user: user), to: self.headerView)
-        self.dateLabel.text = "Created at \(user.createdAt.convertToDisplayFormat())"
+        self.dateLabel.text = "Created at \(user.createdAt.convertToMonthYearFotmat())"
     }
 
     private func add(childVC: UIViewController, to containerView: UIView) {
@@ -125,7 +118,8 @@ final class UserInfoVC: UIViewController {
     }
 }
 
-extension UserInfoVC: UserInfoVCDelegate {
+extension UserInfoVC: GFRepoItemVCDelegate {
+
     func didTapGitHubProfile(for user: User) {
         guard let url = URL(string: user.htmlUrl) else {
             presentGFAlertOnMainThread(title: "Invalid URL",
@@ -135,6 +129,9 @@ extension UserInfoVC: UserInfoVCDelegate {
         }
         presentSafariVC(with: url)
     }
+}
+
+extension UserInfoVC: GFFollowerItemVCDelegate {
 
     func didTapGetFollowers(for user: User) {
         delegate?.didRequestFollowers(for: user.login)

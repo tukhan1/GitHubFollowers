@@ -11,7 +11,7 @@ final class NetworkManager {
 
     static let shared = NetworkManager(baseURL: "https://api.github.com/users/")
 
-    let cahce = NSCache<NSString, UIImage>()
+    let cache = NSCache<NSString, UIImage>()
 
     private var baseURL: String
 
@@ -59,7 +59,7 @@ final class NetworkManager {
         }
         task.resume()
     }
-    
+
     func getUserInfo(for username: String, complition: @escaping (Result<User, GFError>) -> Void ){
         guard let url = URL(string: baseURL + username) else {
             complition(.failure(GFError.invalidUrl))
@@ -88,11 +88,41 @@ final class NetworkManager {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy = .iso8601
                 let user = try decoder.decode(User.self, from: safeData)
                 complition(.success(user))
             } catch {
                 complition(.failure(GFError.invalidData))
             }
+        }
+        task.resume()
+    }
+
+    func downloadImage(from urlString: String, complition: @escaping (UIImage?) -> Void) {
+
+        let cacheKey = NSString(string: urlString)
+
+        if let image = cache.object(forKey: cacheKey) {
+            complition(image)
+            return
+        }
+
+        guard let url = URL(string: urlString) else { complition(nil)
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let self = self,
+                  error == nil,
+                  let response = response as? HTTPURLResponse, response.statusCode == 200,
+                  let safeData = data,
+                  let image = UIImage(data: safeData) else {
+                complition(nil)
+                return
+            }
+
+            self.cache.setObject(image, forKey: cacheKey)
+            complition(image)
         }
         task.resume()
     }

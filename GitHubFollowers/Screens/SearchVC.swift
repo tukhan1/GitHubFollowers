@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class SearchVC: UIViewController {
+final class SearchVC: UIViewController {
 
     private let logoImageView = UIImageView(frame: .zero)
     private let usernameTextField = GFTextField(frame: .zero)
@@ -25,39 +25,39 @@ class SearchVC: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        usernameTextField.text = ""
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
 
-    func createDismissKeyboardTapGesture() {
-        let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
+    private func createDismissKeyboardTapGesture() {
+        let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tap)
     }
 
-    @objc func pushFollowerListVC() {
+    private func configure () {
+        view.backgroundColor = .systemBackground
+
+        view.addSubviews(logoImageView, usernameTextField, callToActionButton)
+
+        usernameTextField.delegate = self
+
+        logoImageView.image = Images.ghLogo
+
+        callToActionButton.addTarget(self, action: #selector(pushFollowerListVC), for: .touchUpInside)
+    }
+
+    @objc private func pushFollowerListVC() {
         guard isUsernameEntered else {
             presentGFAlertOnMainThread(title: "Empty Username",
                                        message: "Please enter a username. We need to know who to look for 😅.",
                                        buttonTitle: "Ok")
             return
         }
-        let followerListVC = FollowerListVC()
-        followerListVC.username = usernameTextField.text ?? ""
-        followerListVC.title = usernameTextField.text
+
+        usernameTextField.resignFirstResponder()
+
+        let followerListVC = FollowerListVC(username: usernameTextField.text!)
         navigationController?.pushViewController(followerListVC, animated: true)
-    }
-
-    private func configure () {
-        usernameTextField.delegate = self
-
-        view.backgroundColor = .systemBackground
-
-        view.addSubview(logoImageView)
-        view.addSubview(usernameTextField)
-        view.addSubview(callToActionButton)
-
-        logoImageView.image = UIImage(named: "gh-logo")!
-
-        callToActionButton.addTarget(self, action: #selector(pushFollowerListVC), for: .touchUpInside)
     }
 
     private func makeConstraints() {
